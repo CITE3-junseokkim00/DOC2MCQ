@@ -1,0 +1,8 @@
+numpy
+torch
+transformers
+sentence-transformers
+keybert
+konlpy
+PyPDF2
+langchain
