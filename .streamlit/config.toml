@@ -1,0 +1,6 @@
+[server]
+port = 5000
+fileWatcherType = "none"
+
+[browser]
+serverAddress = "127.0.0.1"
