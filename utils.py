@@ -8,6 +8,7 @@ from sentence_transformers import SentenceTransformer
 from konlpy.tag import Okt
 from PyPDF2 import PdfReader
 from langchain.text_splitter import CharacterTextSplitter
+from io import StringIO
 
 def doc2Chunk(file_path):
     raw_text=''
@@ -18,8 +19,10 @@ def doc2Chunk(file_path):
             if text:
                 raw_text += text.strip()
     else:
-        with open(file_path, 'r') as f:
-            raw_text = f.read()
+        # with open(file_path, 'r') as f:
+        #     raw_text = f.read()
+        raw_text = StringIO(file_path.getvalue().decode("utf-8")).read()
+        
     
     text_splitter = CharacterTextSplitter(
         separator="\n",
@@ -40,7 +43,8 @@ kw_model = KeyBERT(model=sentence_model)
 okt = Okt()
 
 def keywordExtraction(document):
-    keywords = kw_model.extract_keywords(docs=document,keyphrase_ngram_range=(1,1),stop_words=None,top_n=5)
+    keywords = kw_model.extract_keywords(docs=document,
+                                         keyphrase_ngram_range=(1,1),stop_words=None,top_n=5)
     keywordset = []
     keywords = [keyword[0] for keyword in keywords]
     for i in keywords:
@@ -65,7 +69,8 @@ def summarizer(text,model,tokenizer):
     # max_len = 512
     max_len = 1024
     # encoding = tokenizer.encode_plus(text,max_length=max_len, pad_to_max_length=False, truncation=True, return_tensors='pt').to(device)
-    encoding = tokenizer.encode_plus(text,max_length=max_len, pad_to_max_length=False, truncation=True, return_tensors='pt')
+    encoding = tokenizer.encode_plus(text,max_length=max_len, pad_to_max_length=False, 
+                                     truncation=True, return_tensors='pt')
     input_ids, attention_mask = encoding["input_ids"], encoding["attention_mask"]
     outs = model.generate(input_ids=input_ids,
                           attention_mask=attention_mask,

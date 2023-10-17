@@ -6,3 +6,4 @@ keybert
 konlpy
 PyPDF2
 langchain
+streamlit
