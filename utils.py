@@ -1,7 +1,7 @@
 import numpy as np
 import random
 import torch
-from transformers import T5TokenizerFast
+from transformers import T5TokenizerFast, PreTrainedTokenizerFast, BartForConditionalGeneration
 from transformers.models.t5 import T5ForConditionalGeneration
 from keybert import KeyBERT
 from sentence_transformers import SentenceTransformer
@@ -84,6 +84,26 @@ def summarizer(text,model,tokenizer):
     summary = dec[0]
 
     return summary.strip()
+
+
+
+def load_QuestionGeneration_model_tokenizer():
+    model = BartForConditionalGeneration.from_pretrained('./questionGenerationModel')
+    tokenizer = PreTrainedTokenizerFast.from_pretrained('gogamza/kobart-base-v2')
+    return model, tokenizer
+
+def generate_Question(model, tokenizer, text, keyword):
+    input_ids = tokenizer.encode(text+'<unused0>'+keyword)
+    input_ids = torch.tensor(input_ids)
+    input_ids = input_ids.unsqueeze(0)
+    output = model.generate(inputs=input_ids,bos_token_id=1 ,eos_token_id=1,
+                            length_penalty=1.0 ,max_length=512, num_beams=5)
+    output = tokenizer.decode(output[0], skip_special_tokens=True)
+    return output
+
+
+
+
 
 
 def set_seed(seed: int):
